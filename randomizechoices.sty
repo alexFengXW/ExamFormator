@@ -1,0 +1,47 @@
+% randomizechoices.sty
+\ProvidesPackage{randomizechoices}[2024/10/19 Randomize Choices Package] % Declares the package with a version date
+
+\RequirePackage{xparse} % Loads xparse for advanced command definitions
+\RequirePackage{expl3} % Loads expl3, a programming layer for LaTeX3
+
+\ExplSyntaxOn % Turns on expl3 syntax for more programming-like commands
+
+% Declare variables with module prefix 'rc' (randomize choices)
+\tl_new:N \l_rc_tmpa_tl % Temporary token list for storing data
+\seq_new:N \l_rc_choices_seq % Sequence for storing the choices
+\seq_new:N \l_rc_choice_labels_seq % Sequence for storing the labels of choices
+
+% Define the shuffleChoices command with optional and mandatory arguments
+\NewDocumentCommand{\shuffleChoices}{ O{A,B,C,D,E,F,G,H,I,J} m }
+ {
+  % Clear sequences to prevent residual data
+  \seq_clear:N \l_rc_choices_seq % Clears the sequence of choices
+  \seq_clear:N \l_rc_choice_labels_seq % Clears the sequence of labels
+
+  % Split the input choices and store them in a sequence
+  \seq_set_split:Nnn \l_rc_choices_seq { , } { #2 } % Splits the second argument into elements of a sequence
+
+  % Shuffle the sequence of choices
+  \seq_shuffle:N \l_rc_choices_seq % Randomizes the order of elements in the sequence
+
+  % Initialize the sequence of labels with the optional argument
+  \seq_set_split:Nnn \l_rc_choice_labels_seq { , } { #1 } % Splits the optional argument into labels
+
+  % Map over the shuffled choices and apply the user-defined formatting command
+  \seq_map_inline:Nn \l_rc_choices_seq
+   {
+    % Pop the next label
+    \seq_pop_left:NN \l_rc_choice_labels_seq \l_rc_tmpa_tl % Removes the first element from the label sequence and stores it
+    % Call the formatting command with the label and the choice
+    \rc_format_choice:nn { \l_rc_tmpa_tl } { ##1 } % Formats each choice with its corresponding label
+   }
+ }
+
+% Define a formatting command that users can redefine
+\cs_new:Npn \rc_format_choice:nn #1 #2
+ {
+  % Default formatting: label followed by the choice
+  \par #1:~#2 % Formats the output as a paragraph with the label followed by the choice
+ }
+
+\ExplSyntaxOff % Turns off expl3 syntax

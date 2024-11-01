@@ -1,0 +1,52 @@
+\documentclass{article}
+
+% Import necessary packages
+\usepackage{randomizechoices}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage[a4paper, margin=1in, headheight=50pt]{geometry}
+\usepackage{times}
+
+% Define a custom command for formatting the question
+\newcommand{\question}[1]{%
+  \par\vspace{10pt}\noindent\textbf{\large #1}\par\vspace{5pt}%
+}
+
+% Setup the page headers and footers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{MATH 1229A\\Test 1}}
+\fancyhead[C]{\textbf{SID:} \tikz \node[draw, rectangle, rounded corners, minimum width=2in, minimum height=5mm] {};}
+\fancyhead[R]{\textbf{VERSION: A\\October 15, 2022}}
+\renewcommand{\headrulewidth}{2pt}
+\fancyfoot[C]{\thepage}
+
+% Define the TikZ style to avoid spaces in options
+\tikzset{
+  mynode/.style={
+    shape=rectangle,
+    draw,
+    inner sep=2pt
+  }
+}
+
+\begin{document}
+
+% Redefine the choice formatting command using the TikZ style
+\ExplSyntaxOn
+\cs_set:Nn \rc_format_choice:nn {%
+  \item \tikz[baseline=(char.base)]{%
+    \node[mynode] (char) {%
+      \textbf{#1}: \textit{#2}%
+    };%
+  }%
+}
+\ExplSyntaxOff
+
+% Example usage of the shuffleChoices command
+\question{(1 mark) A1. Who is the president of the USA?}
+\begin{itemize}
+\shuffleChoices{Joe Biden, Donald Trump, Barack Obama, Bill Clinton, George Bush}
+\end{itemize}
+
+\end{document}
